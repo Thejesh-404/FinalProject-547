@@ -2,9 +2,68 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
 
+const { makeExecutableSchema } = require('@graphql-tools/schema')
+const { MongoClient, ObjectId } = require('mongodb')
+const { graphqlHTTP } = require('express-graphql')
+
 const app = express()
 app.use(bodyParser.json())
 app.use(cors())
+
+let uri = 'mongodb+srv://ee547aws:xLDJpNwFpog46AxR@cluster547.achom4n.mongodb.net/?retryWrites=true&w=majority'
+let config = {
+    opt: {
+        useUnifiedTopology: true
+    }
+}
+let client = new MongoClient(uri, config.opt);
+
+const typeDefs = `type Query {
+    player(pid: ID!): Player
+  }
+  
+  type Mutation {
+    playerCreate(
+      playerInput: PlayerCreateInput
+    ): Player
+  }
+
+  input PlayerCreateInput {
+    fname:                     String!
+    lname:                     String
+  }
+  
+  type Player {
+    fname:                  String
+    lname:                  String
+  }`;
+
+const resolvers = {
+    Query: {
+        player: async (_, {pid}, context) => {
+            return context.loaders.player.load(pid)
+        }
+    },
+    Mutation: {
+        playerCreate: async (_, {playerInput:{fname, lname}}, context) => {
+            let player = {
+                fname:fname,
+                lname:lname
+            }
+            let result = await context.db.collection('player').insertOne(player)
+            return result;
+        }
+    }
+}
+
+const schema = makeExecutableSchema({
+    resolvers,
+    resolverValidationOptions: {
+        requireResolversForAllFields: 'ignore',
+        requireResolversToMatchSchema: 'ignore'
+    },
+    typeDefs
+})
 
 // GET /ping
 app.get('/ping', (req, res, next) => {
@@ -16,6 +75,18 @@ app.get('/ping', (req, res, next) => {
         next(err);
     }
 });
+
+app.use('/graphql', graphqlHTTP(async (req, res) => {
+    let db = client.db('ee547_project')
+    console.log(db);
+    return {
+        schema,
+        graphiql: true,
+        context: {
+            db: db
+        }
+    };
+}));
 
 app.get('/status',(req,res)=> {
     res.status(200).send({"message":"hello,world!"})
@@ -190,5 +261,12 @@ app.use((err, req, res, next) => {
     }
 });
 
-app.listen(process.env.PORT || 8081);
+(async () => {
+    let PORT = process.env.PORT;
+    if(!PORT) {
+        PORT = 8081;
+    }
+    app.listen(PORT);
+    console.log(`Server started on port ${PORT}`);
+})();
 
