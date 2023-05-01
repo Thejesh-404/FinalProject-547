@@ -3,6 +3,7 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 
 const { getDb, connectToDb } = require('./db')
+const { ObjectId } = require('mongodb')
 
 const app = express()
 app.use(bodyParser.json({ limit: '10mb' }));
@@ -38,7 +39,6 @@ app.get('/status',(req,res)=> {
     res.status(200).send({"message":"hello,world!"})
 })
 
-
 // if it is post request set status 201 send a json object with key: message
 
 // Create a new item
@@ -63,25 +63,23 @@ app.post('/item', async (req, res, next) => {
 app.post('/user', async (req, res, next) => {
     try {
         // Extract user info
+        const user_data = req.body;
 
         // Write to database
+        const result = await db.collection('users').insertOne(user_data);
 
-        const result = true;
-        if(result)
+        if(result.acknowledged === true)
         {
-            res.writeHead(200, { 'Content-Type': 'text/plain' });
-            res.write("test POST /user");
-            res.end();
+            res.status(201).json({ message: 'User created successfully' });
         }
         else
         {
-            // TODO: what should respond if create failed but not becasue of the input params
-            res.writeHead(400, { 'Content-Type': 'text/plain' });
-            res.end();
+            throw new Error('Could not create new document');
         }
     }
     catch(err) {
-        next(err);
+        console.error(err);
+        res.status(500).json({ error: 'POST /user failed' });
     }
 });
 
@@ -91,25 +89,29 @@ app.post('/user/:uid', async (req, res, next) => {
         const uid = req.params.uid;
         
         // Extract update info
+        const update_info = req.body;
 
         // Write to database
+        const selector = {
+            "_id" : new ObjectId(uid)
+        };
+        const info = {
+            $set: update_info
+        };
 
-        const result = true;
-        if(result)
+        const result = await this.db.collection('users').updateOne(selector, info);
+        if(result.matchedCount === 1)
         {
-            res.writeHead(200, { 'Content-Type': 'text/plain' });
-            res.write("test POST /user/:uid");
-            res.end();
+            res.status(201).json({ message: 'User updated successfully' });
         }
         else
         {
-            // TODO: what should respond if create failed but not becasue of the input params
-            res.writeHead(400, { 'Content-Type': 'text/plain' });
-            res.end();
+            throw new Error(`Could not update user ${uid}`);
         }
     }
     catch(err) {
-        next(err);
+        console.error(err);
+        res.status(500).json({ error: 'POST /user/:uid failed' });
     }
 });
 
@@ -120,25 +122,29 @@ app.post('/item/:pid', async (req, res, next) => {
         const pid = req.params.pid;
         
         // Extract update info
+        const update_info = req.body;
 
         // Write to database
+        const selector = {
+            "_id" : new ObjectId(pid)
+        };
+        const info = {
+            $set: update_info
+        };
 
-        const result = true;
-        if(result)
+        const result = await this.db.collection('products').updateOne(selector, info);
+        if(result.matchedCount === 1)
         {
-            res.writeHead(200, { 'Content-Type': 'text/plain' });
-            res.write("test POST /item/:pid");
-            res.end();
+            res.status(201).json({ message: 'Product updated successfully' });
         }
         else
         {
-            // TODO: what should respond if create failed but not becasue of the input params
-            res.writeHead(400, { 'Content-Type': 'text/plain' });
-            res.end();
+            throw new Error(`Could not update user ${pid}`);
         }
     }
     catch(err) {
-        next(err);
+        console.error(err);
+        res.status(500).json({ error: 'POST /item/:pid failed' });
     }
 });
 
@@ -148,18 +154,18 @@ app.get('/items', async (req, res, next) => {
         // Maybe get filter info?
 
         // Get info from database
-
-        const result = true;
+        // TODO: handle empty collection later
+        const result = await db.collection('products').find().toArray();
         if(result)
         {
-            res.writeHead(200, { 'Content-Type': 'text/plain' });
-            res.write("test GET /items");
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.write(result);
             res.end();
         }
         else
         {
             // TODO: what should respond if create failed but not becasue of the input params
-            res.writeHead(400, { 'Content-Type': 'text/plain' });
+            res.writeHead(404, { 'Content-Type': 'application/json' });
             res.end();
         }
     }
@@ -174,18 +180,21 @@ app.get('/item/:pid', async (req, res, next) => {
         const pid = req.params.pid;
 
         // Get info from database
+        const selector = {
+            "_id" : new ObjectId(pid)
+        };
+        const result = await db.collection('products').findOne(selector);
 
-        const result = true;
         if(result)
         {
-            res.writeHead(200, { 'Content-Type': 'text/plain' });
-            res.write("test GET /items/:pid");
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.write(result);
             res.end();
         }
         else
         {
-            // TODO: what should respond if create failed but not becasue of the input params
-            res.writeHead(400, { 'Content-Type': 'text/plain' });
+            console.error(`Could not get item ${pid}`);
+            res.writeHead(404, { 'Content-Type': 'application/json' });
             res.end();
         }
     }
