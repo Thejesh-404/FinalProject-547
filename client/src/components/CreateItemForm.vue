@@ -16,7 +16,7 @@
       </div>
       <div class="form-group">
         <label for="photo">Photo:</label>
-        <input type="file" id="photo" accept="image/*" @change="handlePhotoUpload">
+        <input type="file" id="image" accept="image/*" @change="handleFileUpload">
       </div>
       <button type="submit" id="button">Submit</button>
     </form>
@@ -26,22 +26,52 @@
 
 
 <script>
+
+import AuthenticationService from '@/services/AuthenticationService'
+
 export default {
   data() {
     return {
       productName: '',
       description: '',
       pickupLocation: '',
-      photo: null
+      image: null,
     };
   },
   methods: {
-    submitForm() {
-      // Handle form submission
+
+    handleFileUpload(event) {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        this.image = reader.result;
+      };
+
+      reader.readAsDataURL(file);
+    }, 
+
+    async submitForm() {
+      
+      const formData = {
+        productName : this.productName,
+        description : this.description,
+        pickupLocation : this.pickupLocation,
+        image: this.image,
+      };
+
+
+      console.log(formData);
+
+      try {
+        const response = await  AuthenticationService.uploadFormData(formData)
+        console.log(response.data)
+      } catch (error) {
+        console.log(error)
+      }
+
     },
-    handlePhotoUpload(event) {
-      this.photo = event.target.files[0];
-    }
+
   }
 };
 </script>
