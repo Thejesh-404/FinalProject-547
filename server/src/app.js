@@ -42,41 +42,51 @@ app.get('/status',(req,res)=> {
 })
 
 // if it is post request set status 201 send a json object with key: message
-app.get('/image/validate', async (req, res, next) => {
+app.get('/image/validate/:pid', async (req, res, next) => {
     try {
-        const image_data = req.body;
+        const pid = req.params.pid;
+        //const pid = "6451aa7458b84df57db6bffa";
 
-        // TODO: testing pid
-        const pid = "644f976a40779b993b17f36d";
         const selector = {
             "_id" : new ObjectId(pid)
         };
         const item = await db.collection('products').findOne(selector);
-        const image = (item.image.split(','))[1];
+        if(item.image) {
+            const image = (item.image.split(','))[1];
 
-        const request = {
-            image: {content: image}
-        };
+            const request = {
+                image: {content: image}
+            };
 
-        
-        const [result] = await visionClient.objectLocalization(request);
-        const objects = result.localizedObjectAnnotations;
-        objects.forEach(object => {
-            console.log(`Name: ${object.name}`);
-            console.log(`Confidence: ${object.score}`);
-            const vertices = object.boundingPoly.normalizedVertices;
-            vertices.forEach(v => console.log(`x: ${v.x}, y:${v.y}`));
-        });
-        console.log(request.image);
-        require("fs").writeFile("out.png", request.image.content, 'base64', function(err) {
-            console.log(err);
-        });
-        console.log(result);
-        res.status(200).json({message: "success"});
+            
+            const [result] = await visionClient.objectLocalization(request);
+            const objects = result.localizedObjectAnnotations;
+            console.log(result);
+            console.log(objects);
+            let info = [];
+            objects.forEach(object => {
+                console.log(`Name: ${object.name}`);
+                console.log(`Confidence: ${object.score}`);
+                const vertices = object.boundingPoly.normalizedVertices;
+                vertices.forEach(v => console.log(`x: ${v.x}, y:${v.y}`));
+                if(object.score >= 0.8) {
+                    info.push(object);
+                }
+            });
+            require("fs").writeFile("out.png", request.image.content, 'base64', function(err) {
+                console.log(err);
+            });
+            
+            console.log("detection complete");
+            res.status(200).json(info);
+        }
+        else {
+            res.status(200).json({ message: 'Did not find an image' });
+        }
     }
     catch(err) {
         console.error(err);
-        res.status(500).json({ error: 'Something went wrong' });
+        res.status(500).json({ error: `/image/validate/${req.params.pid} failed` });
     }
 });
 
