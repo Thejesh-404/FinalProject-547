@@ -1,11 +1,13 @@
 <template>
 
+    <div>
     <header>
       <side-bar-component/>
-      <section class="create-item"> 
-          <create-item-form/>
-      </section>
     </header>
+    <div class="create-item"> 
+          <create-item-form/>
+    </div>
+    </div>
 
 </template>
 
@@ -27,8 +29,9 @@ header {
 }
 
 .create-item {
-  top: 400px;
-  right: 450px;
+  top: 100px;
+  right: 0px;
+  
 }
 
 </style>

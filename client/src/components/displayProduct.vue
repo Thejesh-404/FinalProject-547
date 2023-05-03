@@ -1,10 +1,11 @@
 <template>
   <div class="display-item">
-    <img :src="item.src" class="item-photo">
+    <img :src="items.image" class="item-photo">
     <div class="item-details">
-      <h2 class="item-name">{{ item.bgtext }}</h2>
-      <p class="item-description">{{ item.title }}</p>
-      <p class="pickup-location">Pickup Location: {{ item.color }}</p>
+      <h2 class="item-name">{{ items.productName }}</h2>
+      <p class="item-description">{{ items.description }}</p>
+      <p class="pickup-location">Pickup Location: {{ items.pickupLocation }}</p>
+      <p class="condition">condition: {{items.condition }}</p>
       <button class="contact-seller-btn">Contact the Seller</button>
     </div>
   </div>
@@ -13,9 +14,12 @@
 </template>
 
 <script>
+
+
+
 export default {
   props: {
-    item: {
+    items: {
       type: Object,
       required: true
     }
@@ -24,6 +28,7 @@ export default {
 </script>
 
 <style scoped>
+
 .display-item {
   display: flex;
   align-items: center;
@@ -52,6 +57,7 @@ export default {
 }
 
 .contact-seller-btn {
+  margin-top: 20px;
   color: #fff;
   background-color: #007bff;
   border: none;

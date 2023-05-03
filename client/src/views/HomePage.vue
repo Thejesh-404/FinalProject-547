@@ -1,25 +1,44 @@
 <template>
+
   <div v-if=loggedIn class="parent">
-    <section>
-      <UserProfile :user="user" :on-logout="logout"  class="component1"/>
-    </section>
 
-    <section class="products">
-      <Products
-      v-for="item in items" 
-      :key ="item.color"
-      :product="item"
-      class="item"
-      />
+    <div v-if=itemsLoaded>
+      <section>
+        <UserProfile :user="user" :on-logout="logout"  class="component1"/>
+      </section>
 
-    </section>
-    <button class="donate-btn" @click="redirectToCreate">+</button>
+      <section v-if="items.length!=0" class="products">
+        <Products
+        v-for="item in items" 
+        :key ="item._id"
+        :product="item"
+        class="item"
+        />
+      </section>
+
+      <section v-else class="message">
+        <h1>Nothing on Sale, Come Back Later!</h1>
+      </section>
+
     <section class="donate">
+      <button class="donate-btn" @click="redirectToCreate">+</button>
     </section>
 
+    </div>
 
-  </div>
     <div v-else>
+    <section class="message-loading">
+      <h1>Loading...</h1>
+    </section>
+    </div>
+
+ 
+
+
+  
+  </div>
+    
+  <div v-else>
       <LoginWrapper @update-loggedIn="updateLoggedIn" @update-user="updateUser"/>
     </div>
 </template>
@@ -29,11 +48,8 @@ import {decodeCredential,googleLogout} from 'vue3-google-login'
 import UserProfile from '../components/userhome.vue'
 import LoginWrapper from '../components/userlogin.vue'
 import Products from '../components/card.vue'
+import AuthenticationService from '@/services/AuthenticationService'
 
-import greenShop from "@/assets/green-shoe.png";
-import blueShop from "@/assets/blue-shoe.png";
-import pinkShop from "@/assets/pink-shoe.png";
-import scoot from "@/assets/scoot.jpg";
 
 
 
@@ -49,11 +65,14 @@ if(localStorage.userdata){
   user_data = JSON.parse(localStorage.userdata);
 }
 
-console.log("starting: ")
-console.log(log_status)
-console.log(user_data)
 
 export default {
+
+   async created() {
+        const res = await AuthenticationService.fetchAllProducts();
+        this.items = res.data;
+        this.itemsLoaded = true; 
+    },
 
   components: {
     UserProfile,
@@ -64,32 +83,8 @@ export default {
     return {
       loggedIn: log_status,
       user: user_data,
-      items: [
-        {
-          title: 'Nike Air Max',
-          color: 'green',
-          bgtext: 'NIKE',
-          src: greenShop
-        },
-        {
-          title: 'Nike flex',
-          color: 'blue',
-          bgtext: 'AIR',
-          src: blueShop
-        },
-        {
-          title: 'Nike Roche Runs',
-          color: 'pink',
-          bgtext: 'MAX',
-          src: pinkShop
-        },
-        {
-          title: 'scoot',
-          color: 'pink',
-          bgtext: 'MAX',
-          src: scoot
-        }
-      ]
+      items: [],
+      itemsLoaded: false,
     }
   },
   methods: {
@@ -114,10 +109,6 @@ export default {
         picture : value.picture,
         email : value.email
       }
-
-      console.log(req_value)
-
-
       this.user = req_value
       localStorage.setItem('userdata', JSON.stringify(req_value))
     },
@@ -143,8 +134,18 @@ export default {
   flex-wrap: wrap;
 }
 
+.message-loading {
+  top: 400px;
+  left: 700px;
+}
+
+.message {
+  top: 400px;
+  left: 550px;
+}
+
 .item {
-  width: 33.33%; /* Each item takes up one-third of the container width */
+  width: 23%; /* Each item takes up one-third of the container width */
   box-sizing: border-box;
 }
 

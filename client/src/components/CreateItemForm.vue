@@ -15,14 +15,36 @@
         <input type="text" id="pickup-location" v-model="pickupLocation" required>
       </div>
       <div class="form-group">
+        <label for="condition">Condition:</label>
+        <select id="condition" v-model="condition">
+          <option value="">Select Condition</option>
+          <option value="Brand New">Brand New</option>
+          <option value="Almost New">Almost New</option>
+          <option value="Used">Used</option>
+          <option value="Well Used">Well Used</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="category">Category</label>
+        <select id="category" v-model="category">
+          <option value="">Select Category</option>
+          <option value="Electronics">Electronics</option>
+          <option value="Furniture">Furniture</option>
+          <option value="Clothing">Clothing</option>
+          <option value="Books">Books</option>
+          <option value="Tools">Tools</option>
+        </select>
+      </div>
+      <div class="form-group">
         <label for="photo">Photo:</label>
         <input type="file" id="image" accept="image/*" @change="handleFileUpload">
       </div>
       <button type="submit" id="button">Submit</button>
+      <div v-if="Message" class="message">{{ Message }}</div>
     </form>
+   
   </div>
 </template>
-
 
 
 <script>
@@ -35,12 +57,16 @@ export default {
       productName: '',
       description: '',
       pickupLocation: '',
+      condition: '',
+      category: '',
       image: null,
+      Message: null,
     };
   },
+
   methods: {
 
-    handleFileUpload(event) {
+  handleFileUpload(event) {
       const file = event.target.files[0];
       const reader = new FileReader();
 
@@ -57,19 +83,29 @@ export default {
         productName : this.productName,
         description : this.description,
         pickupLocation : this.pickupLocation,
+        condition : this.condition,
+        category : this.category,
         image: this.image,
       };
 
+      const response = await  AuthenticationService.uploadFormData(formData)
 
-      console.log(formData);
+      if (response && response.data.message) {
 
-      try {
-        const response = await  AuthenticationService.uploadFormData(formData)
-        console.log(response.data)
-      } catch (error) {
-        console.log(error)
+        this.Message = 'Product created Successfully';
+        this.productName = '';
+        this.description= '';
+        this.pickupLocation = '';
+        this.condition = '';
+        this.category = '';
+        this.image = null;
+        document.getElementById('image').value = '';
+      }
+      else {
+        this.Message = 'There seems to be an error. Try Again....'
       }
 
+    
     },
 
   }
@@ -91,7 +127,7 @@ export default {
 
 .form {
   align-items: center;
-  height: 550px;
+  height: 800px;
   width: 500px;
   background-color: #fff;
   padding: 20px;
@@ -105,7 +141,7 @@ export default {
 }
 
 .form-group {
-  margin-bottom: 30px;
+  margin-bottom: 25px;
 }
 
 .form-group label {
@@ -138,4 +174,45 @@ button[type="submit"] {
 button[type="submit"]:hover {
   background-color: #006B8F;
 }
+
+.message {
+  color: red;
+  margin-top: 20px;
+  margin-left: 120px;
+
+}
+
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+select {
+  display: block;
+  width: 100%;
+  height: calc(1.5em + 0.75rem + 2px);
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #495057;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+select:focus {
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+
+
+
 </style>
+
+

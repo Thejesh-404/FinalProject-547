@@ -1,10 +1,24 @@
 <template>
-    <header>
-      <side-bar-component/>
-      <section class="display-item">
-        <display-component :item="item"/>
-      </section>
-    </header>
+
+    <div>
+
+      <div v-if=itemsLoaded>
+        <header>
+          <side-bar-component/>
+        </header>
+        <div class="display-item">
+          <display-component :items="items"/>
+        </div>
+      </div>
+
+      <div v-else>
+        <div class="message-loading">
+          <h1>Loading...</h1>
+        </div>
+      </div>
+
+    </div>
+
 </template>
 
 
@@ -25,10 +39,16 @@ header {
 }
 
 .display-item {
-  right: 240px;
-  top: 200px;
+  width: 600px;
+  height: 400px;
+  left: 200px;
+  top: 100px;
 }
 
+.message-loading {
+  top: 400px;
+  left: 700px;
+}
 
 </style>
 
@@ -37,19 +57,25 @@ import sideBarComponent from '../components/sidebar.vue';
 import userBarComponent from '../components/userbar.vue'
 import displayProduct from '../components/displayProduct.vue';
 
+import AuthenticationService from '@/services/AuthenticationService'
 
-import scoot from "@/assets/scoot.jpg";
 
 export default {
 
+  async created() {
+        const url = window.location.href;
+        const parts = url.split('/');
+        const id = parts[parts.length - 1];
+        const res = await AuthenticationService.fetchSingleProduct(id)
+        this.items = res.data;
+        console.log(typeof res.data)
+        this.itemsLoaded = true; 
+  },
+
   data() {
     return {
-    item : {
-          title: 'scoot',
-          color: 'pink',
-          bgtext: 'MAX',
-          src: scoot
-        }
+      items : null,
+      itemsLoaded: false,
     }
   },
   components: {
