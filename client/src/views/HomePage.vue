@@ -52,7 +52,6 @@ import AuthenticationService from '@/services/AuthenticationService'
 
 
 
-
 let log_status = false;
 let user_data = null;
 

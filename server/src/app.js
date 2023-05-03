@@ -242,6 +242,45 @@ app.get('/item/:pid', async (req, res, next) => {
     }
 });
 
+// Get User by email id
+app.get('/user/:email', async (req, res, next) => {
+    try {
+        const email = req.params.email;
+
+        // Get info from database
+        const selector = {
+            "email" : email
+        };
+
+        const result = await db.collection('users').findOne(selector);
+
+
+        if(result)
+        {
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.write(JSON.stringify(result));
+            res.end();
+        }
+        else
+        {
+            console.error(`User Does Not exist: ${email}`);
+            res.status(200).send(null)
+        }
+    }
+    catch(err) {
+        next(err);
+    }
+});
+
+
+
+
+
+
+
+
+
+
 // Handle all error paths
 app.use((err, req, res, next) => {
     console.log(err);

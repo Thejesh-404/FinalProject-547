@@ -51,6 +51,9 @@
 
 import AuthenticationService from '@/services/AuthenticationService'
 
+
+console.log(JSON.parse(localStorage.userdata))
+
 export default {
   data() {
     return {
@@ -86,6 +89,7 @@ export default {
         condition : this.condition,
         category : this.category,
         image: this.image,
+        owner: JSON.parse(localStorage.userdata).email
       };
 
       const response = await  AuthenticationService.uploadFormData(formData)

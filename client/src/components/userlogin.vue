@@ -11,12 +11,30 @@
 
 
 import {decodeCredential} from 'vue3-google-login'
+import AuthenticationService from '@/services/AuthenticationService'
 
 export default {
   methods: {
-    callback(response) {
+    async callback(response) {
+
+      const user_detail_google = decodeCredential(response.credential)
       this.$emit('update-loggedIn', true)
-      this.$emit('update-user', decodeCredential(response.credential))
+      this.$emit('update-user', user_detail_google)
+      const user = await AuthenticationService.fetchUserByEmail(user_detail_google.email)
+      if(user.data!=""){
+        return
+      }
+      else{
+        const data = {
+        name : user_detail_google.name,
+        given_name : user_detail_google.given_name,
+        family_name : user_detail_google.family_name,
+        email : user_detail_google.email
+        }
+        const add_user = await AuthenticationService.storeUserData(data)
+        console.log(add_user)
+      }
+
     }
   }
 }

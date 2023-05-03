@@ -6,6 +6,14 @@ export default {
         return Api().post('item',data)
     },
 
+    storeUserData(data){
+        return Api().post('user',data)
+    },
+
+    fetchUserByEmail(email){
+        return Api().get(`user/${email}`)
+    },
+
     fetchAllProducts(){
         return Api().get('items')
     },
