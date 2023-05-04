@@ -29,6 +29,10 @@ const router = createRouter({
       name: 'editProduct',
       component: () => import('../views/editPage.vue')
     },
+    {
+      path: '/:pathMatch(.*)*',
+      component: () => import('../views/notFoundPage.vue')
+    }
   ]
 })
 
