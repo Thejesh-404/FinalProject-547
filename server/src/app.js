@@ -37,10 +37,6 @@ app.get('/ping', (req, res, next) => {
     }
 });
 
-app.get('/status',(req,res)=> {
-    res.status(200).send({"message":"hello,world!"})
-})
-
 // if it is post request set status 201 send a json object with key: message
 app.get('/image/validate/:pid', async (req, res, next) => {
     try {
@@ -133,16 +129,16 @@ app.post('/user', async (req, res, next) => {
 });
 
 // Modify the given user
-app.post('/user/:uid', async (req, res, next) => {
+app.post('/user/:email', async (req, res, next) => {
     try {
-        const uid = req.params.uid;
+        const email = req.params.email;
         
         // Extract update info
         const update_info = req.body;
 
         // Write to database
         const selector = {
-            "_id" : new ObjectId(uid)
+            "email" : email
         };
         const info = {
             $set: update_info
