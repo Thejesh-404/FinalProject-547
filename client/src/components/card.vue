@@ -1,7 +1,6 @@
 <template>
 
 <div class="product">
-
     <router-link style="text-decoration: none;  color: inherit;" :to="{ name: 'product', params: { id: product._id}}">
     <div class="product-inner">
         <div class="product-text-wrap">

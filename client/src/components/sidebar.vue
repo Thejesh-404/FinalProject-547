@@ -1,12 +1,11 @@
 <template>
       <div class="header-left" >
 
-      <button class="menu-toggle" @click="toggleMenu">☰</button>
-      <div class="side-bar" @click="closeSidebar">
-        <span id="cross-button">X</span>
+      <button class="menu-toggle" @click.stop="toggleMenu">☰</button>
+      <div class="side-bar">
         <h2>Hi,{{user.given_name}}</h2>
         <hr>
-        <h3> My items</h3>
+        <router-link to="/myitems" class="my-items-btn">My items</router-link>
       </div>
       <div class="logo" @click="redirectToHome">
         <img :src="logo">
@@ -28,8 +27,15 @@ export default {
       user : JSON.parse(localStorage.userdata),
       logo : logo
     }
-  },
-
+    },
+    mounted() {
+    document.addEventListener('click', (event) => {
+      const menu = document.querySelector('.side-bar');
+      if (!menu.contains(event.target)) {
+        this.closeSidebar();
+      }
+    });
+    },
   methods: {
       toggleMenu() {
       const menu = document.querySelector('.side-bar');
@@ -41,7 +47,10 @@ export default {
       },
       redirectToHome() {
       this.$router.push('/')
-    } 
+      },
+      redirectToMyItems(){
+        this.$router.push('/myitems')
+      } 
     }
 
 }
@@ -112,6 +121,21 @@ export default {
 .logo img {
   width: 100%; /* to make sure the image fits within the container */
   height: 100%; /* to make sure the image fits within the container */
+}
+
+.my-items-btn {
+  display: block;
+  padding: 10px;
+  margin-top: 20px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 5px;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
 }
 
 </style>

@@ -1,8 +1,8 @@
 <template>
 
   <div v-if=loggedIn class="parent">
-
     <div v-if=itemsLoaded>
+
       <section>
         <UserProfile :user="user" :on-logout="logout"  class="component1"/>
       </section>

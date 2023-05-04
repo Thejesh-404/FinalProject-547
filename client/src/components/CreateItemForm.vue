@@ -89,7 +89,8 @@ export default {
         condition : this.condition,
         category : this.category,
         image: this.image,
-        owner: JSON.parse(localStorage.userdata).email
+        owner: JSON.parse(localStorage.userdata).email,
+        isSold: false,
       };
 
       const response = await  AuthenticationService.uploadFormData(formData)
