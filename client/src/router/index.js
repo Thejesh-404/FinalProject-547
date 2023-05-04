@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomePage.vue'
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -35,5 +35,15 @@ const router = createRouter({
     }
   ]
 })
+
+router.beforeEach((to, from, next) => {
+  // check if user is logged in
+  if (to.path !== '/' && !localStorage.getItem('isloggedin')) {
+    // user is not logged in, redirect to login page
+    next('/');
+  } else {
+    next();
+  }
+});
 
 export default router
