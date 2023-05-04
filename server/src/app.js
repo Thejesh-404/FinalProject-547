@@ -219,7 +219,8 @@ app.get('/items', async (req, res, next) => {
         }
     }
     catch(err) {
-        next(err);
+        console.error(err);
+        res.status(500).json({ error: 'GET /items failed' });
     }
 });
 
@@ -248,7 +249,8 @@ app.get('/item/:pid', async (req, res, next) => {
         }
     }
     catch(err) {
-        next(err);
+        console.error(err);
+        res.status(500).json({ error: 'GET /item/:pid failed' });
     }
 });
 
@@ -278,10 +280,60 @@ app.get('/user/:email', async (req, res, next) => {
         }
     }
     catch(err) {
-        next(err);
+        console.error(err);
+        res.status(500).json({ error: 'GET /user/:email failed' });
     }
 });
 
+// Delete Product by product id
+app.delete('/item/:pid', async (req, res, next) => {
+    try {
+        const pid = req.params.pid;
+
+        const selector = {
+            "_id" : new ObjectId(pid)
+        };
+        const result = await db.collection('products').deleteOne(selector);
+        if(result.deletedCount === 1)
+        {
+            res.status(200).json({ message: "delete success" });
+        }
+        else 
+        {
+            
+            res.status(400).json({ error: `unable to delete ${req.params.pid}` });
+        }
+    }
+    catch(err) {
+        console.error(err);
+        res.status(500).json({ error: 'DELETE /item/:pid failed' });
+    }
+});
+
+// Delete user by email id
+app.delete('/user/:email', async (req, res, next) => {
+    try {
+        const email = req.params.email;
+
+        const selector = {
+            "email" : email
+        };
+        const result = await db.collection('users').deleteOne(selector);
+        if(result.deletedCount === 1)
+        {
+            res.status(200).json({ message: "delete success" });
+        }
+        else 
+        {
+            
+            res.status(400).json({ error: `unable to delete ${req.params.email}` });
+        }
+    }
+    catch(err) {
+        console.error(err);
+        res.status(500).json({ error: 'DELETE /user/:email failed' });
+    }
+});
 
 
 
