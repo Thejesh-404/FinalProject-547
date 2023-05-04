@@ -37,10 +37,6 @@ app.get('/ping', (req, res, next) => {
     }
 });
 
-app.get('/status',(req,res)=> {
-    res.status(200).send({"message":"hello,world!"})
-})
-
 // if it is post request set status 201 send a json object with key: message
 app.get('/image/validate/:pid', async (req, res, next) => {
     try {
