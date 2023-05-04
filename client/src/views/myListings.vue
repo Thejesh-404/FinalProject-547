@@ -99,6 +99,7 @@ header {
 
 #check{
     top: 100px;
+    left: 50px;
 }
 
 
@@ -116,9 +117,9 @@ header {
   left: 700px;
 }
 
-.message {
-  top: 400px;
-  left: 550px;
+.message{
+  top:100px;
+  left: 300px;
 }
 
 .item {

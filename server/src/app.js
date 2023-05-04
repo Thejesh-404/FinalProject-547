@@ -11,7 +11,10 @@ app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 app.use(cors());
 
 const vision = require('@google-cloud/vision');
-const visionClient = new vision.ImageAnnotatorClient();
+
+const visionClient = new vision.ImageAnnotatorClient({
+    keyFilename: 'apikey.json'
+});
 
 // db connection
 let db
@@ -37,16 +40,9 @@ app.get('/ping', (req, res, next) => {
     }
 });
 
-// if it is post request set status 201 send a json object with key: message
-app.get('/image/validate/:pid', async (req, res, next) => {
+app.post('/image/validate', async (req, res, next) => {
     try {
-        const pid = req.params.pid;
-        //const pid = "6451aa7458b84df57db6bffa";
-
-        const selector = {
-            "_id" : new ObjectId(pid)
-        };
-        const item = await db.collection('products').findOne(selector);
+        const item = req.body;
         if(item.image) {
             const image = (item.image.split(','))[1];
 
@@ -54,27 +50,20 @@ app.get('/image/validate/:pid', async (req, res, next) => {
                 image: {content: image}
             };
 
-            
             const [result] = await visionClient.objectLocalization(request);
             const objects = result.localizedObjectAnnotations;
-            console.log(result);
-            console.log(objects);
-            let info = [];
-            objects.forEach(object => {
-                console.log(`Name: ${object.name}`);
-                console.log(`Confidence: ${object.score}`);
-                const vertices = object.boundingPoly.normalizedVertices;
-                vertices.forEach(v => console.log(`x: ${v.x}, y:${v.y}`));
-                if(object.score >= 0.8) {
-                    info.push(object);
+            let maxScore = 0;
+            let maxName = '';
+            for (let i = 0; i < objects.length; i++) {
+            if (objects[i].score > maxScore) {
+                maxScore = objects[i].score;
+                maxName = objects[i].name;
                 }
-            });
-            require("fs").writeFile("out.png", request.image.content, 'base64', function(err) {
-                console.log(err);
-            });
-            
+            }
+            const maxObject = {name: maxName, score: maxScore};
+            console.log(maxObject);
             console.log("detection complete");
-            res.status(200).json(info);
+            res.status(200).json(maxObject);
         }
         else {
             res.status(200).json({ message: 'Did not find an image' });
@@ -82,7 +71,7 @@ app.get('/image/validate/:pid', async (req, res, next) => {
     }
     catch(err) {
         console.error(err);
-        res.status(500).json({ error: `/image/validate/${req.params.pid} failed` });
+        res.status(500).json({ error: `/image validation failed` });
     }
 });
 
@@ -388,11 +377,6 @@ app.delete('/user/:email', async (req, res, next) => {
         res.status(500).json({ error: 'DELETE /user/:email failed' });
     }
 });
-
-
-
-
-
 
 
 

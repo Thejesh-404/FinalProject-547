@@ -40,5 +40,10 @@ export default {
 
     DeleteProduct(id){
         return Api().delete(`item/${id}`)
+    },
+
+    CheckProductNameAndImage(image_data){
+        console.log(image_data)
+        return Api().post('/image/validate',image_data)
     }
 }

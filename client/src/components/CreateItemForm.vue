@@ -11,8 +11,8 @@
         <textarea id="description" v-model="description"></textarea>
       </div>
       <div class="form-group">
-        <label for="pickup-location">Pickup Location:</label>
-        <input type="text" id="pickup-location" v-model="pickupLocation" required>
+        <label for="location-input">Pickup Location:</label>
+        <input type="text" id="location-input" v-model="pickupLocation" required>
       </div>
       <div class="form-group">
         <label for="condition">Condition:</label>
@@ -53,6 +53,23 @@ import AuthenticationService from '@/services/AuthenticationService'
 
 
 export default {
+
+  
+
+  mounted() {
+
+      console.log(google)
+      const searchInput = document.getElementById('location-input');
+      const autocomplete = new google.maps.places.Autocomplete(searchInput, {
+        types: ['geocode'],
+        fields: ['formatted_address', 'geometry'],
+      });
+      autocomplete.addListener('place_changed', () => {
+        const place = autocomplete.getPlace();
+        this.pickupLocation = place.formatted_address;
+      });
+    },
+
   data() {
     return {
       productName: '',
@@ -71,15 +88,21 @@ export default {
       const file = event.target.files[0];
       const reader = new FileReader();
 
-      reader.onload = () => {
+      reader.onload = async () => {
         this.image = reader.result;
+        const image_data = {
+        image : this.image
+        }
+        const image_check = await AuthenticationService.CheckProductNameAndImage(image_data)
+        console.log(image_check.data)
+        if(image_check.data.score>0.80){
+        this.productName = image_check.data.name;
+        }
       };
-
       reader.readAsDataURL(file);
     }, 
 
     async submitForm() {
-      
       const formData = {
         productName : this.productName,
         description : this.description,
@@ -113,12 +136,8 @@ export default {
 
   }
 };
+
 </script>
-
-
-
-
-
 
 <style scoped>
 .form-container {

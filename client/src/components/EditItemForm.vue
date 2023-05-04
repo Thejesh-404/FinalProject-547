@@ -1,7 +1,7 @@
 <template>
   <div class="form-container">
     <form class="form" @submit.prevent="submitForm">
-      <h2>Product Form</h2>
+      <h2>Edit Item</h2>
       <div class="form-group">
         <label for="product-name">Product Name:</label>
         <input type="text" id="product-name" v-model="productName" required>

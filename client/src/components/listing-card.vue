@@ -78,6 +78,7 @@ export default {
           isSold : true
         }
         const res = await AuthenticationService.updateFormData(data,this.product._id)
+        window.location.reload();
     }
   },   
 }
