@@ -37,13 +37,15 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  // check if user is logged in
-  if (to.path !== '/' && !localStorage.getItem('isloggedin')) {
-    // user is not logged in, redirect to login page
+  const isloggedIn = (localStorage.isloggedIn === 'true');
+  if (to.path !== '/' && !(isloggedIn)){
+    console.log("inside")
     next('/');
   } else {
     next();
   }
+
+  
 });
 
 export default router
