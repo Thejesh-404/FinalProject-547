@@ -35,10 +35,6 @@
           <option value="Tools">Tools</option>
         </select>
       </div>
-      <div class="form-group">
-        <label for="photo">Photo:</label>
-        <input type="file" id="image" accept="image/*" @change="handleFileUpload">
-      </div>
       <button type="submit" id="button">Submit</button>
       <div v-if="Message" class="message">{{ Message }}</div>
     </form>
@@ -53,30 +49,27 @@ import AuthenticationService from '@/services/AuthenticationService'
 
 
 export default {
+
+  props: {
+    item: {
+      type: Object,
+      required: true
+    }
+  },
+
   data() {
     return {
-      productName: '',
-      description: '',
-      pickupLocation: '',
-      condition: '',
-      category: '',
-      image: null,
+      productName: this.item.productName,
+      description: this.item.description,
+      pickupLocation: this.item.pickupLocation,
+      condition: this.item.condition,
+      category: this.item.category,
       Message: null,
     };
   },
 
   methods: {
 
-  handleFileUpload(event) {
-      const file = event.target.files[0];
-      const reader = new FileReader();
-
-      reader.onload = () => {
-        this.image = reader.result;
-      };
-
-      reader.readAsDataURL(file);
-    }, 
 
     async submitForm() {
       
@@ -86,23 +79,18 @@ export default {
         pickupLocation : this.pickupLocation,
         condition : this.condition,
         category : this.category,
-        image: this.image,
         owner: JSON.parse(localStorage.userdata).email,
         isSold: false,
       };
 
-      const response = await  AuthenticationService.uploadFormData(formData)
+      const url = window.location.href;
+      const parts = url.split('/');
+      const id = parts[parts.length - 1];
+
+      const response = await  AuthenticationService.updateFormData(formData,id)
 
       if (response && response.data.message) {
-
-        this.Message = 'Product created Successfully';
-        this.productName = '';
-        this.description= '';
-        this.pickupLocation = '';
-        this.condition = '';
-        this.category = '';
-        this.image = null;
-        document.getElementById('image').value = '';
+        this.Message = 'Product Details Updated Successfully';
       }
       else {
         this.Message = 'There seems to be an error. Try Again....'
@@ -113,6 +101,7 @@ export default {
 
   }
 };
+
 </script>
 
 
@@ -130,7 +119,7 @@ export default {
 
 .form {
   align-items: center;
-  height: 800px;
+  height: 680px;
   width: 500px;
   background-color: #fff;
   padding: 20px;

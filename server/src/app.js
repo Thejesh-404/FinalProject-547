@@ -181,8 +181,11 @@ app.post('/item/:pid', async (req, res, next) => {
             $set: update_info
         };
 
-        const result = await this.db.collection('products').updateOne(selector, info);
-        if(result.matchedCount === 1)
+
+
+        const result = await db.collection('products').findOneAndUpdate(selector, info);
+
+        if(result.value)
         {
             res.status(201).json({ message: 'Product updated successfully' });
         }
@@ -200,11 +203,23 @@ app.post('/item/:pid', async (req, res, next) => {
 // Get all items
 app.get('/items', async (req, res, next) => {
     try {
-        // Maybe get filter info?
+        
+        const item_status = req.query.sold_items;
+        let selector;
+
+        // if query parameter sold_items=true(return all sold items)
+        //                    sold_items=false(return un sold items)
+        //if not provided anything return all
+        if (item_status==='true' || item_status==='false'){
+            selector = (item_status==='true') ? {isSold:true}  : {isSold:false}
+        }else if(item_status==='*'){
+            selector = {}
+        }
+
 
         // Get info from database
         // TODO: handle empty collection later
-        const result = await db.collection('products').find().toArray();
+        const result = await db.collection('products').find(selector).toArray();
         if(result)
         {
             res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -223,6 +238,49 @@ app.get('/items', async (req, res, next) => {
         res.status(500).json({ error: 'GET /items failed' });
     }
 });
+
+
+
+// Get items by user email
+app.get('/items/:email', async (req, res, next) => {
+    try {
+
+        const email = req.params.email;
+        const item_status = req.query.sold_items;
+        let selector;
+
+        // if query parameter sold_items=true(return all sold items)
+        //                    sold_items=false(return un sold items)
+        //if not provided anything return all
+        if (item_status==='true' || item_status==='false'){
+            selector = (item_status==='true') ? {owner: email,isSold:true}  : {owner: email,isSold:false}
+        }else if(item_status==='*'){
+            selector = {}
+        }
+
+
+        // Get info from database
+        // TODO: handle empty collection later
+        const result = await db.collection('products').find(selector).toArray();
+        if(result)
+        {
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.write(JSON.stringify(result));
+            res.end();
+        }
+        else
+        {
+            // TODO: what should respond if create failed but not becasue of the input params
+            res.writeHead(404, { 'Content-Type': 'application/json' });
+            res.end();
+        }
+    }
+    catch(err) {
+        console.error(err);
+        res.status(500).json({ error: 'GET /items failed' });
+    }
+});
+
 
 // Get a specific item
 app.get('/item/:pid', async (req, res, next) => {

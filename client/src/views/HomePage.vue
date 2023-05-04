@@ -33,9 +33,6 @@
     </div>
 
  
-
-
-  
   </div>
     
   <div v-else>
@@ -68,7 +65,7 @@ if(localStorage.userdata){
 export default {
 
    async created() {
-        const res = await AuthenticationService.fetchAllProducts();
+        const res = await AuthenticationService.fetchUnSoldProducts();
         this.items = res.data;
         this.itemsLoaded = true; 
     },

@@ -1,6 +1,6 @@
 <template>
   <div class="product">
-    <div class="product-inner" ref="productInner">
+    <div class="product-inner" >
       <div class="product-text-wrap">
       </div>
       <div class="product-image-wrap">
@@ -14,8 +14,8 @@
         <v-btn icon @click="show">
           <v-icon>mdi-dots-vertical</v-icon>
         </v-btn>
-        <v-menu v-model="showOptions"  :close-on-content-click="false" attach="#productInner"
-        min-width="80px"   offset-y>
+        <v-menu v-model="showOptions"  :close-on-content-click="false" attach="product-inner"
+        min-width="120px"   offset-y>
           <v-list>
             <v-list-item @click="view">
               <v-list-item-title>View</v-list-item-title>
@@ -23,8 +23,11 @@
             <v-list-item @click="edit">
               <v-list-item-title>Edit</v-list-item-title>
             </v-list-item>
-            <v-list-item @click="deletee">
+            <v-list-item @click="deleteItem">
               <v-list-item-title>Delete</v-list-item-title>
+            </v-list-item>
+            <v-list-item @click="soldItem">
+              <v-list-item-title>Item sold!</v-list-item-title>
             </v-list-item>
           </v-list>
         </v-menu>
@@ -38,9 +41,10 @@
 <script>
 
 import { mdiDotsVertical } from '@mdi/js';
-
+import AuthenticationService from '@/services/AuthenticationService'
 
 export default {
+
     props: {
         product: {
         type: Object,
@@ -65,9 +69,16 @@ export default {
     edit() {
        this.$router.push(`/edit/product/${this.product._id}`)
     },
-    deletee() {
-      // Do something when the Delete button is clicked
+    async deleteItem() {
+       const res = await AuthenticationService.DeleteProduct(this.product._id);
+        window.location.reload();
     },
+    async soldItem(){
+        const data = {
+          isSold : true
+        }
+        const res = await AuthenticationService.updateFormData(data,this.product._id)
+    }
   },   
 }
 </script>
