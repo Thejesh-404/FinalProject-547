@@ -129,16 +129,16 @@ app.post('/user', async (req, res, next) => {
 });
 
 // Modify the given user
-app.post('/user/:uid', async (req, res, next) => {
+app.post('/user/:email', async (req, res, next) => {
     try {
-        const uid = req.params.uid;
+        const email = req.params.email;
         
         // Extract update info
         const update_info = req.body;
 
         // Write to database
         const selector = {
-            "_id" : new ObjectId(uid)
+            "email" : email
         };
         const info = {
             $set: update_info
