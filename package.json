@@ -1,0 +1,13 @@
+{
+    "name": "University_Thriftshop",
+    "version": "1.0.0",
+    "description": "",
+    "scripts": {
+      "install": "yarn client-install && yarn server-install",
+      "client-install": "cd client && yarn install",
+      "client-start": "cd client && yarn dev",
+      "server-install": "cd server && yarn install",
+      "server-start": "cd server/src && yarn start"
+    }
+  }
+  
