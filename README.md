@@ -22,7 +22,7 @@ yarn server-start
 Run the following command on terminal 2 to start the Vue client:
 
 ```bash
-yarn install
+yarn client-start
 ```
 
 ## Folder Structure/ Architecture
