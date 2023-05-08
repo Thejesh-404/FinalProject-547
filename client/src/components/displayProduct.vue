@@ -7,6 +7,9 @@
       <p class="pickup-location">Pickup Location: {{ items.pickupLocation }}</p>
       <p class="condition">condition: {{items.condition }}</p>
       <button class="contact-seller-btn">Contact the Seller</button>
+      <div>
+        <h4>{{owner}}</h4>
+      </div>
     </div>
   </div>
 
@@ -24,6 +27,17 @@ export default {
       required: true
     }
   },
+  data (){
+    return {
+      owner: ''
+    }
+  },
+  methods: {
+    ownerDetails(){
+      this.owner = this.items.owner;
+    }
+
+  }
 }
 </script>
 
