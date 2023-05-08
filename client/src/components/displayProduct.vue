@@ -6,7 +6,7 @@
       <p class="item-description">{{ items.description }}</p>
       <p class="pickup-location">Pickup Location: {{ items.pickupLocation }}</p>
       <p class="condition">condition: {{items.condition }}</p>
-      <button class="contact-seller-btn">Contact the Seller</button>
+      <button class="contact-seller-btn" @click="ownerDetails">Contact the Seller</button>
       <div>
         <h4>{{owner}}</h4>
       </div>
