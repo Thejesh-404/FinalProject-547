@@ -6,6 +6,7 @@
         <h2>Hi,{{user.given_name}}</h2>
         <hr>
         <router-link to="/myitems" class="my-items-btn">My items</router-link>
+         <router-link to="/message" class="my-items-btn">Messages</router-link>
       </div>
       <div class="logo" @click="redirectToHome">
         <img :src="logo">
